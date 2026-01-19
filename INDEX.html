@@ -1,0 +1,156 @@
+    .score { font-size: 28px; font-weight: bold; margin: 16px 0; }
+  </style>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <div class="container" id="app"></div>
+
+  <script>
+    let step = 1;
+    let score = 0;
+
+    const app = document.getElementById('app');
+
+    const questions = [
+      {
+        text: "ช่วง 7 วันที่ผ่านมา คุณมีอาการไอหรือไม่",
+        options: [
+          { label: "ไม่มีอาการ", point: 0 },
+          { label: "ไอเล็กน้อย", point: 1 },
+          { label: "ไอบ่อย / รุนแรง", point: 2 }
+        ]
+      },
+      {
+        text: "คุณมีเสมหะร่วมด้วยหรือไม่",
+        options: [
+          { label: "ไม่มีเสมหะ", point: 0 },
+          { label: "มีเสมหะ", point: 1 }
+        ]
+      },
+      {
+        text: "คุณรู้สึกแน่นหน้าอกหรือหายใจไม่สะดวกหรือไม่",
+        options: [
+          { label: "ไม่เลย", point: 0 },
+          { label: "เล็กน้อย", point: 1 },
+          { label: "บ่อย / รุนแรง", point: 2 }
+        ]
+      },
+      {
+        text: "คุณมีอาการหอบเหนื่อยขณะทำกิจกรรมปกติหรือไม่",
+        options: [
+          { label: "ไม่มี", point: 0 },
+          { label: "บางครั้ง", point: 1 },
+          { label: "บ่อย", point: 2 }
+        ]
+      },
+      {
+        text: "คุณสูบบุหรี่หรืออยู่ใกล้ควันบุหรี่เป็นประจำหรือไม่",
+        options: [
+          { label: "ไม่เลย", point: 0 },
+          { label: "เป็นบางครั้ง", point: 1 },
+          { label: "เป็นประจำ", point: 2 }
+        ]
+      }
+    ];
+
+    async function render() {
+      if (window.liff && !liff.isInitialized()) {
+        await liff.init({ liffId: '2008918068' });
+      }
+      app.innerHTML = '';
+
+      if (step <= questions.length) {
+        const q = questions[step - 1];
+
+        const title = document.createElement('h1');
+        title.textContent = '🫁 แบบทดสอบสุขภาพปอด';
+
+        const progressWrap = document.createElement('div');
+        progressWrap.style.margin = '12px 0 20px 0';
+
+        const progressBg = document.createElement('div');
+        progressBg.style.height = '8px';
+        progressBg.style.background = '#eef1f7';
+        progressBg.style.borderRadius = '999px';
+        progressBg.style.overflow = 'hidden';
+
+        const progressBar = document.createElement('div');
+        progressBar.style.height = '100%';
+        progressBar.style.width = Math.round((step - 1) / questions.length * 100) + '%';
+        progressBar.style.background = 'linear-gradient(90deg,#74b9ff,#0984e3)';
+
+        progressBg.appendChild(progressBar);
+        progressWrap.appendChild(progressBg);
+
+        const stepText = document.createElement('div');
+        stepText.className = 'step';
+        stepText.textContent = `คำถามข้อที่ ${step} จาก ${questions.length}`;
+
+        const questionText = document.createElement('div');
+        questionText.className = 'question';
+        questionText.textContent = q.text;
+
+        app.appendChild(title);
+        app.appendChild(progressWrap);
+        app.appendChild(stepText);
+        app.appendChild(questionText);
+
+        q.options.forEach(option => {
+          const btn = document.createElement('button');
+          btn.className = 'btn';
+          btn.textContent = option.label;
+          btn.addEventListener('click', () => answer(option.point));
+          app.appendChild(btn);
+        });
+
+      } else {
+        let level = 'ความเสี่ยงต่ำ';
+        if (score >= 4) level = 'ความเสี่ยงปานกลาง';
+        if (score >= 7) level = 'ความเสี่ยงสูง';
+
+        const result = document.createElement('div');
+        result.className = 'result';
+        result.innerHTML = `
+          <h1>📊 ผลการประเมิน</h1>
+          <div class="score">${level}</div>
+          <p>คะแนนรวม: ${score}</p>
+          <p style="font-size:14px;color:#666">* ผลประเมินนี้ไม่ใช่การวินิจฉัยทางการแพทย์</p>
+          <button class="btn" id="sendLine">ส่งผลไปที่ LINE</button>
+        `;
+        app.appendChild(result);
+
+        document.getElementById('sendLine').addEventListener('click', () => {
+          if (!window.liff || !liff.isInClient()) return alert('ต้องเปิดผ่าน LINE เท่านั้น');
+
+          const flex = {
+            type: 'flex',
+            altText: 'ผลประเมินสุขภาพปอด',
+            contents: {
+              type: 'bubble',
+              body: {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                  { type: 'text', text: '🫁 ผลประเมินสุขภาพปอด', weight: 'bold', size: 'lg' },
+                  { type: 'text', text: level, size: 'xl', margin: 'md', color: '#0984e3' },
+                  { type: 'text', text: `คะแนนรวม: ${score}`, margin: 'md' }
+                ]
+              }
+            }
+          };
+
+          liff.sendMessages([flex]).then(() => liff.closeWindow());
+        });
+      }
+    }
+
+    function answer(point) {
+      score += point;
+      step++;
+      render();
+    }
+
+    render();
+  </script>
+</body>
+</html>
