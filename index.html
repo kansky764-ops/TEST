@@ -2,160 +2,162 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <title>ทดสอบสุขภาพปอด</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบคัดกรองโรคปอด</title>
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #cfe7ff, #f0f8ff);
-      padding: 20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #eaf4ff;
+      margin: 0;
+      padding: 0;
     }
-
-    .card {
-      background: #fff;
-      border-radius: 20px;
-      padding: 25px;
-      max-width: 420px;
+    .container {
+      max-width: 520px;
       margin: auto;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      padding: 16px;
     }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    /* Progress bar */
-    .progress-container {
-      background: #e9ecef;
-      border-radius: 20px;
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,123,255,0.15);
       overflow: hidden;
-      margin-bottom: 20px;
-      height: 12px;
+      margin-bottom: 16px;
     }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #6aa9ff, #9ddcff);
-      transition: width 0.3s ease;
-    }
-
-    .question {
-      font-size: 16px;
-      margin-bottom: 15px;
-    }
-
-    .answers button {
+    .hero img {
       width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+    .content {
+      padding: 16px;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+      color: #0d47a1;
+    }
+    p {
+      margin: 0 0 16px;
+      color: #1565c0;
+    }
+    .buttons {
+      display: flex;
+      gap: 12px;
+    }
+    button {
+      flex: 1;
       padding: 12px;
-      margin-top: 10px;
-      border-radius: 14px;
+      border-radius: 12px;
       border: none;
-      font-size: 15px;
+      font-size: 1rem;
       cursor: pointer;
-      background: #f1f6ff;
-      transition: 0.2s;
     }
-
-    .answers button:hover {
-      background: #dceaff;
+    .yes {
+      background: #1e88e5;
+      color: #fff;
     }
-
+    .no {
+      background: #bbdefb;
+      color: #0d47a1;
+    }
     .result {
       text-align: center;
-      padding: 20px;
-      border-radius: 16px;
-      font-weight: bold;
-      margin-top: 10px;
+      padding: 24px;
     }
-
-    .low { background: #e6f7ec; color: #1e7e34; }
-    .mid { background: #fff8e1; color: #856404; }
-    .high { background: #fdecea; color: #721c24; }
+    .low { color: #1e88e5; }
+    .medium { color: #f9a825; }
+    .high { color: #d32f2f; }
   </style>
 </head>
-
 <body>
-  <div class="card">
-    <h2>🫁 ทดสอบสุขภาพปอด</h2>
-
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
+  <div class="container">
+    <div id="app" class="card">
+      <div class="hero">
+        <img id="image" src="https://i.imgur.com/9QZ7W5R.png" alt="lung" />
+      </div>
+      <div class="content">
+        <h1 id="question">กำลังโหลดคำถาม...</h1>
+        <p id="desc">แบบคัดกรองโรคปอดเบื้องต้น</p>
+        <div class="buttons">
+          <button class="yes" onclick="answer(true)">มี</button>
+          <button class="no" onclick="answer(false)">ไม่มี</button>
+        </div>
+      </div>
     </div>
-
-    <div id="content"></div>
   </div>
 
-<script>
-const questions = [
-  "คุณมีอาการไอเรื้อรังเกิน 2 สัปดาห์หรือไม่?",
-  "คุณเหนื่อยง่ายหรือหายใจไม่อิ่มบ่อยไหม?",
-  "คุณอยู่ในพื้นที่ PM2.5 สูงเป็นประจำหรือไม่?",
-  "คุณสูบบุหรี่หรือได้รับควันบุหรี่เป็นประจำหรือไม่?",
-  "เคยมีประวัติโรคทางเดินหายใจหรือไม่?"
-];
+  <script>
+    const questions = [
+      {
+        text: 'คุณมีอาการไอเรื้อรังมากกว่า 3 สัปดาห์หรือไม่?',
+        score: 2,
+        image: 'https://i.imgur.com/9QZ7W5R.png'
+      },
+      {
+        text: 'คุณรู้สึกหายใจลำบาก หรือเหนื่อยง่ายหรือไม่?',
+        score: 3,
+        image: 'https://i.imgur.com/2yAfY6X.png'
+      },
+      {
+        text: 'คุณมีอาการเจ็บหน้าอกขณะหายใจหรือไม่?',
+        score: 3,
+        image: 'https://i.imgur.com/kL8Z6nB.png'
+      },
+      {
+        text: 'คุณไอมีเสมหะหรือปนเลือดหรือไม่?',
+        score: 3,
+        image: 'https://i.imgur.com/LxZ4HkK.png'
+      },
+      {
+        text: 'คุณสัมผัสฝุ่น PM2.5 หรือควันเป็นประจำหรือไม่?',
+        score: 2,
+        image: 'https://i.imgur.com/y4JX8ZC.png'
+      }
+    ];
 
-let index = 0;
-let score = 0;
+    let index = 0;
+    let totalScore = 0;
 
-const content = document.getElementById("content");
-const progressBar = document.getElementById("progressBar");
+    function render() {
+      if (index >= questions.length) {
+        showResult();
+        return;
+      }
+      document.getElementById('question').innerText = questions[index].text;
+      document.getElementById('image').src = questions[index].image;
+    }
 
-function renderQuestion() {
-  const progress = ((index) / questions.length) * 100;
-  progressBar.style.width = progress + "%";
+    function answer(isYes) {
+      if (isYes) {
+        totalScore += questions[index].score;
+      }
+      index++;
+      render();
+    }
 
-  content.innerHTML = `
-    <div class="question">
-      <strong>ข้อ ${index + 1}/${questions.length}</strong><br>
-      ${questions[index]}
-    </div>
-    <div class="answers">
-      <button onclick="answer(1)">✅ ใช่</button>
-      <button onclick="answer(0)">❌ ไม่ใช่</button>
-    </div>
-  `;
-}
+    function showResult() {
+      let level = 'ต่ำ';
+      let className = 'low';
 
-function answer(value) {
-  score += value;
-  index++;
+      if (totalScore > 3 && totalScore <= 7) {
+        level = 'ปานกลาง';
+        className = 'medium';
+      } else if (totalScore > 7) {
+        level = 'สูง';
+        className = 'high';
+      }
 
-  if (index < questions.length) {
-    renderQuestion();
-  } else {
-    showResult();
-  }
-}
+      document.getElementById('app').innerHTML = `
+        <div class="result">
+          <h1>🫁 ผลการคัดกรอง</h1>
+          <p class="${className}"><strong>ระดับความเสี่ยง: ${level}</strong></p>
+          <p>คะแนนรวม: ${totalScore}</p>
+          <p>หากมีความเสี่ยงปานกลางหรือสูง แนะนำให้พบแพทย์</p>
+        </div>
+      `;
+    }
 
-function showResult() {
-  progressBar.style.width = "100%";
-
-  let text = "";
-  let cls = "";
-
-  if (score <= 1) {
-    text = "🟢 ความเสี่ยงต่ำ<br>สุขภาพปอดอยู่ในเกณฑ์ดี";
-    cls = "low";
-  } else if (score <= 3) {
-    text = "🟡 ความเสี่ยงปานกลาง<br>ควรดูแลสุขภาพปอดมากขึ้น";
-    cls = "mid";
-  } else {
-    text = "🔴 ความเสี่ยงสูง<br>แนะนำให้พบแพทย์";
-    cls = "high";
-  }
-
-  content.innerHTML = `
-    <div class="result ${cls}">
-      คะแนนรวม ${score}/${questions.length}<br><br>
-      ${text}
-    </div>
-  `;
-}
-
-renderQuestion();
-</script>
+    render();
+  </script>
 </body>
 </html>
