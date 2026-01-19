@@ -2,90 +2,129 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <title>LIFF Test Page</title>
+  <title>ทดสอบสุขภาพปอด</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5f7fb;
+      background: #eef4ff;
       padding: 20px;
-      text-align: center;
     }
     .card {
       background: #fff;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      max-width: 400px;
+      border-radius: 14px;
+      max-width: 420px;
       margin: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    .question {
+      margin: 15px 0;
     }
     button {
-      background: #06c755;
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
       color: #fff;
       border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
       cursor: pointer;
       margin-top: 10px;
     }
-    button:disabled {
-      background: #ccc;
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      text-align: center;
     }
-    .info {
-      text-align: left;
-      margin-top: 15px;
-      font-size: 14px;
-    }
+    .low { background: #d4edda; color: #155724; }
+    .mid { background: #fff3cd; color: #856404; }
+    .high { background: #f8d7da; color: #721c24; }
   </style>
 </head>
 
 <body>
   <div class="card">
-    <h2>🧪 LIFF Test</h2>
-    <p id="status">กำลังโหลด LIFF...</p>
+    <h2>🫁 แบบทดสอบสุขภาพปอด</h2>
 
-    <button id="loginBtn" onclick="login()" disabled>Login ด้วย LINE</button>
+    <div class="question">
+      1️⃣ คุณมีอาการไอเรื้อรังเกิน 2 สัปดาห์หรือไม่?
+      <br>
+      <input type="radio" name="q1" value="1"> มี  
+      <input type="radio" name="q1" value="0"> ไม่มี
+    </div>
 
-    <div class="info" id="result"></div>
+    <div class="question">
+      2️⃣ คุณเหนื่อยง่ายหรือหายใจไม่อิ่มบ่อยไหม?
+      <br>
+      <input type="radio" name="q2" value="1"> ใช่  
+      <input type="radio" name="q2" value="0"> ไม่ใช่
+    </div>
+
+    <div class="question">
+      3️⃣ คุณอยู่ในพื้นที่ PM2.5 สูงเป็นประจำหรือไม่?
+      <br>
+      <input type="radio" name="q3" value="1"> ใช่  
+      <input type="radio" name="q3" value="0"> ไม่ใช่
+    </div>
+
+    <div class="question">
+      4️⃣ คุณสูบบุหรี่หรือได้รับควันบุหรี่เป็นประจำหรือไม่?
+      <br>
+      <input type="radio" name="q4" value="1"> ใช่  
+      <input type="radio" name="q4" value="0"> ไม่ใช่
+    </div>
+
+    <div class="question">
+      5️⃣ เคยมีประวัติโรคทางเดินหายใจหรือไม่?
+      <br>
+      <input type="radio" name="q5" value="1"> เคย  
+      <input type="radio" name="q5" value="0"> ไม่เคย
+    </div>
+
+    <button onclick="calculate()">ประเมินผล</button>
+
+    <div id="result"></div>
   </div>
 
   <script>
-    const LIFF_ID = "2008918068"; // ใส่ LIFF ID ของคุณ
-
-    async function init() {
-      try {
-        await liff.init({ liffId: LIFF_ID });
-
-        document.getElementById("status").innerText = "LIFF พร้อมใช้งาน ✅";
-
-        if (liff.isLoggedIn()) {
-          document.getElementById("loginBtn").style.display = "none";
-          const profile = await liff.getProfile();
-
-          document.getElementById("result").innerHTML = `
-            <b>ชื่อ:</b> ${profile.displayName}<br>
-            <b>User ID:</b> ${profile.userId}
-          `;
-        } else {
-          document.getElementById("loginBtn").disabled = false;
+    function calculate() {
+      let score = 0;
+      for (let i = 1; i <= 5; i++) {
+        const q = document.querySelector(`input[name="q${i}"]:checked`);
+        if (!q) {
+          alert("กรุณาตอบคำถามให้ครบทุกข้อ");
+          return;
         }
-
-      } catch (err) {
-        document.getElementById("status").innerText = "เกิดข้อผิดพลาด ❌";
-        console.error(err);
+        score += parseInt(q.value);
       }
-    }
 
-    function login() {
-      liff.login();
-    }
+      let resultText = "";
+      let className = "";
 
-    init();
+      if (score <= 1) {
+        resultText = "🟢 ความเสี่ยงต่ำ\nปอดอยู่ในเกณฑ์ดี";
+        className = "low";
+      } else if (score <= 3) {
+        resultText = "🟡 ความเสี่ยงปานกลาง\nควรดูแลสุขภาพปอด";
+        className = "mid";
+      } else {
+        resultText = "🔴 ความเสี่ยงสูง\nควรพบแพทย์เพื่อตรวจเพิ่มเติม";
+        className = "high";
+      }
+
+      const resultDiv = document.getElementById("result");
+      resultDiv.className = `result ${className}`;
+      resultDiv.innerText = `คะแนนรวม: ${score}/5\n\n${resultText}`;
+    }
   </script>
 </body>
 </html>
