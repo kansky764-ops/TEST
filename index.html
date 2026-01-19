@@ -3,128 +3,159 @@
 <head>
   <meta charset="UTF-8" />
   <title>ทดสอบสุขภาพปอด</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #eef4ff;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #cfe7ff, #f0f8ff);
       padding: 20px;
     }
+
     .card {
       background: #fff;
-      padding: 20px;
-      border-radius: 14px;
+      border-radius: 20px;
+      padding: 25px;
       max-width: 420px;
       margin: auto;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     }
+
     h2 {
       text-align: center;
+      margin-bottom: 10px;
     }
+
+    /* Progress bar */
+    .progress-container {
+      background: #e9ecef;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      height: 12px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6aa9ff, #9ddcff);
+      transition: width 0.3s ease;
+    }
+
     .question {
-      margin: 15px 0;
+      font-size: 16px;
+      margin-bottom: 15px;
     }
-    button {
+
+    .answers button {
       width: 100%;
       padding: 12px;
-      background: #007bff;
-      color: #fff;
+      margin-top: 10px;
+      border-radius: 14px;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      font-size: 15px;
       cursor: pointer;
+      background: #f1f6ff;
+      transition: 0.2s;
+    }
+
+    .answers button:hover {
+      background: #dceaff;
+    }
+
+    .result {
+      text-align: center;
+      padding: 20px;
+      border-radius: 16px;
+      font-weight: bold;
       margin-top: 10px;
     }
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 10px;
-      font-weight: bold;
-      text-align: center;
-    }
-    .low { background: #d4edda; color: #155724; }
-    .mid { background: #fff3cd; color: #856404; }
-    .high { background: #f8d7da; color: #721c24; }
+
+    .low { background: #e6f7ec; color: #1e7e34; }
+    .mid { background: #fff8e1; color: #856404; }
+    .high { background: #fdecea; color: #721c24; }
   </style>
 </head>
 
 <body>
   <div class="card">
-    <h2>🫁 แบบทดสอบสุขภาพปอด</h2>
+    <h2>🫁 ทดสอบสุขภาพปอด</h2>
 
-    <div class="question">
-      1️⃣ คุณมีอาการไอเรื้อรังเกิน 2 สัปดาห์หรือไม่?
-      <br>
-      <input type="radio" name="q1" value="1"> มี  
-      <input type="radio" name="q1" value="0"> ไม่มี
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <div class="question">
-      2️⃣ คุณเหนื่อยง่ายหรือหายใจไม่อิ่มบ่อยไหม?
-      <br>
-      <input type="radio" name="q2" value="1"> ใช่  
-      <input type="radio" name="q2" value="0"> ไม่ใช่
-    </div>
-
-    <div class="question">
-      3️⃣ คุณอยู่ในพื้นที่ PM2.5 สูงเป็นประจำหรือไม่?
-      <br>
-      <input type="radio" name="q3" value="1"> ใช่  
-      <input type="radio" name="q3" value="0"> ไม่ใช่
-    </div>
-
-    <div class="question">
-      4️⃣ คุณสูบบุหรี่หรือได้รับควันบุหรี่เป็นประจำหรือไม่?
-      <br>
-      <input type="radio" name="q4" value="1"> ใช่  
-      <input type="radio" name="q4" value="0"> ไม่ใช่
-    </div>
-
-    <div class="question">
-      5️⃣ เคยมีประวัติโรคทางเดินหายใจหรือไม่?
-      <br>
-      <input type="radio" name="q5" value="1"> เคย  
-      <input type="radio" name="q5" value="0"> ไม่เคย
-    </div>
-
-    <button onclick="calculate()">ประเมินผล</button>
-
-    <div id="result"></div>
+    <div id="content"></div>
   </div>
 
-  <script>
-    function calculate() {
-      let score = 0;
-      for (let i = 1; i <= 5; i++) {
-        const q = document.querySelector(`input[name="q${i}"]:checked`);
-        if (!q) {
-          alert("กรุณาตอบคำถามให้ครบทุกข้อ");
-          return;
-        }
-        score += parseInt(q.value);
-      }
+<script>
+const questions = [
+  "คุณมีอาการไอเรื้อรังเกิน 2 สัปดาห์หรือไม่?",
+  "คุณเหนื่อยง่ายหรือหายใจไม่อิ่มบ่อยไหม?",
+  "คุณอยู่ในพื้นที่ PM2.5 สูงเป็นประจำหรือไม่?",
+  "คุณสูบบุหรี่หรือได้รับควันบุหรี่เป็นประจำหรือไม่?",
+  "เคยมีประวัติโรคทางเดินหายใจหรือไม่?"
+];
 
-      let resultText = "";
-      let className = "";
+let index = 0;
+let score = 0;
 
-      if (score <= 1) {
-        resultText = "🟢 ความเสี่ยงต่ำ\nปอดอยู่ในเกณฑ์ดี";
-        className = "low";
-      } else if (score <= 3) {
-        resultText = "🟡 ความเสี่ยงปานกลาง\nควรดูแลสุขภาพปอด";
-        className = "mid";
-      } else {
-        resultText = "🔴 ความเสี่ยงสูง\nควรพบแพทย์เพื่อตรวจเพิ่มเติม";
-        className = "high";
-      }
+const content = document.getElementById("content");
+const progressBar = document.getElementById("progressBar");
 
-      const resultDiv = document.getElementById("result");
-      resultDiv.className = `result ${className}`;
-      resultDiv.innerText = `คะแนนรวม: ${score}/5\n\n${resultText}`;
-    }
-  </script>
+function renderQuestion() {
+  const progress = ((index) / questions.length) * 100;
+  progressBar.style.width = progress + "%";
+
+  content.innerHTML = `
+    <div class="question">
+      <strong>ข้อ ${index + 1}/${questions.length}</strong><br>
+      ${questions[index]}
+    </div>
+    <div class="answers">
+      <button onclick="answer(1)">✅ ใช่</button>
+      <button onclick="answer(0)">❌ ไม่ใช่</button>
+    </div>
+  `;
+}
+
+function answer(value) {
+  score += value;
+  index++;
+
+  if (index < questions.length) {
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  progressBar.style.width = "100%";
+
+  let text = "";
+  let cls = "";
+
+  if (score <= 1) {
+    text = "🟢 ความเสี่ยงต่ำ<br>สุขภาพปอดอยู่ในเกณฑ์ดี";
+    cls = "low";
+  } else if (score <= 3) {
+    text = "🟡 ความเสี่ยงปานกลาง<br>ควรดูแลสุขภาพปอดมากขึ้น";
+    cls = "mid";
+  } else {
+    text = "🔴 ความเสี่ยงสูง<br>แนะนำให้พบแพทย์";
+    cls = "high";
+  }
+
+  content.innerHTML = `
+    <div class="result ${cls}">
+      คะแนนรวม ${score}/${questions.length}<br><br>
+      ${text}
+    </div>
+  `;
+}
+
+renderQuestion();
+</script>
 </body>
 </html>
