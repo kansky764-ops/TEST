@@ -169,16 +169,22 @@
     function showResult() {
       let level = 'ต่ำ';
       let className = 'low';
+      let riskImage = 'https://i.imgur.com/lowRisk.png';
 
       if (totalScore > 3 && totalScore <= 7) {
         level = 'ปานกลาง';
         className = 'medium';
+        riskImage = 'https://i.imgur.com/mediumRisk.png';
       } else if (totalScore > 7) {
         level = 'สูง';
         className = 'high';
+        riskImage = 'https://i.imgur.com/highRisk.png';
       }
 
       document.getElementById('app').innerHTML = `
+        <div class="hero">
+          <img src="${riskImage}" alt="risk" />
+        </div>
         <div class="result">
           <h1>🫁 ผลการคัดกรอง</h1>
           <p class="${className}"><strong>ระดับความเสี่ยง: ${level}</strong></p>
