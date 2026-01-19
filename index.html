@@ -1,11 +1,91 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>LIFF Test</title>
+  <meta charset="UTF-8" />
+  <title>LIFF Test Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      padding: 20px;
+      text-align: center;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: auto;
+    }
+    button {
+      background: #06c755;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:disabled {
+      background: #ccc;
+    }
+    .info {
+      text-align: left;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>✅ GitHub Pages ใช้งานได้แล้ว</h1>
-  <p>หน้านี้เปิดผ่าน LIFF ได้</p>
+  <div class="card">
+    <h2>🧪 LIFF Test</h2>
+    <p id="status">กำลังโหลด LIFF...</p>
+
+    <button id="loginBtn" onclick="login()" disabled>Login ด้วย LINE</button>
+
+    <div class="info" id="result"></div>
+  </div>
+
+  <script>
+    const LIFF_ID = "2008918068"; // ใส่ LIFF ID ของคุณ
+
+    async function init() {
+      try {
+        await liff.init({ liffId: LIFF_ID });
+
+        document.getElementById("status").innerText = "LIFF พร้อมใช้งาน ✅";
+
+        if (liff.isLoggedIn()) {
+          document.getElementById("loginBtn").style.display = "none";
+          const profile = await liff.getProfile();
+
+          document.getElementById("result").innerHTML = `
+            <b>ชื่อ:</b> ${profile.displayName}<br>
+            <b>User ID:</b> ${profile.userId}
+          `;
+        } else {
+          document.getElementById("loginBtn").disabled = false;
+        }
+
+      } catch (err) {
+        document.getElementById("status").innerText = "เกิดข้อผิดพลาด ❌";
+        console.error(err);
+      }
+    }
+
+    function login() {
+      liff.login();
+    }
+
+    init();
+  </script>
 </body>
 </html>
